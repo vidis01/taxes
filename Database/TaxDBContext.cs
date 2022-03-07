@@ -8,14 +8,9 @@ namespace TaxDB
         public DbSet<Municipality> Municipalities { get; set; }
         public DbSet<TaxRate> TaxRates { get; set; }
 
-        public TaxDBContext()
+        public TaxDBContext(DbContextOptions<TaxDBContext> options) : base(options)
         {
             Database.EnsureCreated();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(
-                @"Server=(localdb)\mssqllocaldb;Database=TaxDB;Trusted_Connection=True");            
         }
     }
 }

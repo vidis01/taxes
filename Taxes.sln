@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{84
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxDB", "Database\TaxDB.csproj", "{B285D721-CC61-4FB1-A593-C4D046EB30A1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{579DAA3B-8FD7-4C23-ADF5-80AF7821D054}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxAPI", "API\TaxAPI.csproj", "{11954843-C2F4-46E4-923B-02281F4145AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{B285D721-CC61-4FB1-A593-C4D046EB30A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B285D721-CC61-4FB1-A593-C4D046EB30A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B285D721-CC61-4FB1-A593-C4D046EB30A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11954843-C2F4-46E4-923B-02281F4145AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11954843-C2F4-46E4-923B-02281F4145AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11954843-C2F4-46E4-923B-02281F4145AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11954843-C2F4-46E4-923B-02281F4145AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B285D721-CC61-4FB1-A593-C4D046EB30A1} = {842230A0-CC50-47B4-B120-94F28BA097C1}
+		{11954843-C2F4-46E4-923B-02281F4145AD} = {579DAA3B-8FD7-4C23-ADF5-80AF7821D054}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2D1E9164-7F74-49DA-9FB2-9A9D44B0680B}
