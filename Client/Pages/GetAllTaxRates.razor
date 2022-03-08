@@ -1,0 +1,244 @@
+﻿@page "/getalltaxrates"
+
+@using TaxClient.Data
+@using System.Text.Json
+@using System.Text
+@inject IHttpClientFactory ClientFactory
+
+<EditForm Model="@municipalityName" OnValidSubmit=@ValidFormSubmitted>
+    <h1>Get all registered tax rates for municipality</h1>
+    <hr />
+    <div class="form-group row">
+        <label for="municipalityname" class="col-sm-2 col-form-label">Municipality name</label>
+        <div class="col-sm-3">
+            <InputText required id="municipalityname" class="form-control" disabled=@isLoading @bind-Value="municipalityName" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <input type="submit" class="col-sm-5 btn btn-primary" disabled=@isLoading value="Get rates">
+    </div>
+
+</EditForm>
+
+@if (isLoading)
+{
+    <div class="spinner"></div>
+}
+else if (showMessage)
+{
+    <h1>Tax rates not found!</h1>
+}
+else if (rates != null && rates.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Id</th>
+                <th>Period (C)</th>
+                <th>From Date (F)</th>
+                <th>To Date</th>
+                <th>Rate</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rate in rates)
+            {
+                <tr>
+                    <td>
+                        <input name="type_radio" type="radio" @onclick="(() => Select(rate))" />
+                    </td>
+                    <td>@rate.Id</td>
+                    <td>@rate.Period</td>
+                    <td>@rate.FromDate.ToShortDateString()</td>
+                    @if (rate.ToDate.HasValue)
+                    {
+                        <td>@rate.ToDate.Value.ToShortDateString()</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td>@rate.Rate</td>
+                    <td>
+                        @if (SelectedRow == rate)
+                        {
+                            <div class="row">
+                                <input type="button" class="col-sm-3 btn btn-primary mr-3" disabled=@isLoading @onclick="() => ShowUpdateForm()" value="Update">
+                                <input type="button" class="col-sm-3 btn btn-primary" disabled=@isLoading @onclick="() => ShowDeleteApproval()" value="Delete">
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (updateSelected)
+    {
+        <EditForm Model="@SelectedRow" OnValidSubmit=@ValidUpdateFormSubmitted>
+            <h1>Update municipality tax rate</h1>
+            <hr />
+            <div class="form-group row">
+                <label for="id" class="col-sm-2 col-form-label">Id</label>
+                <div class="col-sm-3">
+                    <InputNumber required id="id" class="form-control" disabled=@isLoading @bind-Value="SelectedRow.Id" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="period" class="col-sm-2 col-form-label">Period</label>
+                <div class="col-sm-3">
+                    <InputSelect required id="period" class="form-control" disabled=@isLoading @bind-Value="SelectedRow.Period">
+                        @foreach (Period period in Enum.GetValues(typeof(Period)))
+                                {
+                            <option value="@period">@period</option>
+                                }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="fromdate" class="col-sm-2 col-form-label">From date</label>
+                <div class="col-sm-3">
+                    <InputDate required id="fromdate" class="form-control" disabled=@isLoading @bind-Value="SelectedRow.FromDate" />
+                </div>
+            </div>
+            @if (SelectedRow.Period != Period.DAILY)
+            {
+                <div class="form-group row">
+                    <label for="todate" class="col-sm-2 col-form-label">To date</label>
+                    <div class="col-sm-3">
+                        <InputDate required id="todate" class="form-control" disabled=@isLoading @bind-Value="SelectedRow.ToDate" />
+                    </div>
+                </div>
+            }
+            <div class="form-group row">
+                <label for="rate" class="col-sm-2 col-form-label">Rate</label>
+                <div class="col-sm-3">
+                    <InputNumber required id="rate" class="form-control" disabled=@isLoading @bind-Value="SelectedRow.Rate" min="0" max="1" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <input type="submit" class="col-sm-5 btn btn-primary" disabled=@isLoading value="Save">
+            </div>
+
+        </EditForm>
+    }
+    else if (deleteSelected)
+    {
+<h1>Do you really want to delete selected record?</h1>
+        <div class="row">
+            <input type="button" class="col-sm-3 btn btn-primary mr-3" disabled=@isLoading @onclick="() => DeleteRecord(true)" value="Yes">
+            <input type="button" class="col-sm-3 btn btn-primary" disabled=@isLoading @onclick="() => DeleteRecord(false)" value="No">
+        </div>
+    }
+}
+
+@code {
+    string municipalityName = "";
+
+    IEnumerable<TaxRateData> rates;
+
+    bool isLoading;
+
+    bool showMessage;
+
+    bool updateSelected;
+
+    bool deleteSelected;
+
+    public TaxRateData SelectedRow { get; set; }
+
+    private void Select(TaxRateData taxRateData)
+    {
+        SelectedRow = taxRateData;
+    }
+
+    private void ShowUpdateForm()
+    {
+        updateSelected = true;
+    }
+
+    private void ShowDeleteApproval()
+    {
+        deleteSelected = true;
+    }
+
+    private async void ValidFormSubmitted()
+    {
+        showMessage = false;
+        isLoading = true;
+        var request = new HttpRequestMessage(HttpMethod.Get,
+        $"https://localhost:5002/api/Tax/{municipalityName}");
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            using (var responseStream = await response.Content.ReadAsStreamAsync())
+            {
+                rates = await JsonSerializer.DeserializeAsync<IEnumerable<TaxRateData>>(
+                    responseStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+        }
+        if (!rates.Any()) showMessage = true;
+        isLoading = false;
+        this.StateHasChanged();
+    }
+
+    private async void ValidUpdateFormSubmitted()
+    {
+        isLoading = true;
+        var request = new HttpRequestMessage(HttpMethod.Put,
+        $"https://localhost:5002/api/Tax");
+
+        var jsonData = JsonSerializer.Serialize(SelectedRow);
+
+        request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json"); ;
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+        }
+
+        isLoading = false;
+        updateSelected = false;
+        SelectedRow = null;
+        this.StateHasChanged();
+    }
+
+    private async void DeleteRecord(bool doDelete)
+    {
+        if (doDelete)
+        {
+            isLoading = true;
+            var request = new HttpRequestMessage(HttpMethod.Delete,
+            $"https://localhost:5002/api/Tax/{SelectedRow.Id}");
+
+            var client = ClientFactory.CreateClient();
+
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+            }
+            isLoading = false;
+            deleteSelected = false;
+            SelectedRow = null;
+            ValidFormSubmitted();
+        }
+        else
+        {
+            deleteSelected = false;
+            SelectedRow = null;
+            this.StateHasChanged();
+        }
+    }
+}

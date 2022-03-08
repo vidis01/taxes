@@ -33,15 +33,15 @@ namespace TaxAPI
                                 selectedRate = rate.Rate;
                         break;
                         case Period.WEEKLY:
-                            if (rate.FromDate <= date && rate.ToDate <= date)
+                            if (rate.FromDate.Date <= date.Date && rate.ToDate.Value.Date >= date)
                                 selectedRate = rate.Rate;
                             break;
                         case Period.MONTHLY:
-                            if (rate.FromDate <= date && rate.ToDate <= date)
+                            if (rate.FromDate.Date <= date.Date && rate.ToDate.Value.Date >= date)
                                 selectedRate = rate.Rate;
                             break;
                         case Period.YEARLY:
-                            if (rate.FromDate <= date && rate.ToDate <= date)
+                            if (rate.FromDate.Date <= date.Date && rate.ToDate.Value.Date >= date)
                                 selectedRate = rate.Rate;
                             break;
                         default:

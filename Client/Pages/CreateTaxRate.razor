@@ -1,0 +1,93 @@
+﻿@page "/createtaxrate"
+
+@using TaxClient.Data
+@using System.Text.Json
+@using System.Text
+@inject IHttpClientFactory ClientFactory
+
+<EditForm Model="@newTaxRateData" OnValidSubmit=@ValidFormSubmitted>
+    <h1>Create municipality tax rate</h1>
+    <hr />
+    <div class="form-group row">
+        <label for="municipalityname" class="col-sm-2 col-form-label">Municipality name</label>
+        <div class="col-sm-3">
+            <InputText required id="municipalityname" class="form-control" disabled=@isLoading @bind-Value="newTaxRateData.Municipality" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="period" class="col-sm-2 col-form-label">Period</label>
+        <div class="col-sm-3">
+            <InputSelect required id="period" class="form-control" disabled=@isLoading @bind-Value="newTaxRateData.Period">
+                @foreach (Period period in Enum.GetValues(typeof(Period)))
+                {
+                    <option value="@period">@period</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="fromdate" class="col-sm-2 col-form-label">From date</label>
+        <div class="col-sm-3">
+            <InputDate required id="fromdate" class="form-control" disabled=@isLoading @bind-Value="newTaxRateData.FromDate" />
+        </div>
+    </div>
+    @if (newTaxRateData.Period != Period.DAILY)
+    {
+        <div class="form-group row">
+            <label for="todate" class="col-sm-2 col-form-label">To date</label>
+            <div class="col-sm-3">
+                <InputDate required id="todate" class="form-control" disabled=@isLoading @bind-Value="newTaxRateData.ToDate" />
+            </div>
+        </div>
+    }
+    <div class="form-group row">
+        <label for="rate" class="col-sm-2 col-form-label">Rate</label>
+        <div class="col-sm-3">
+            <InputNumber required id="rate" class="form-control" disabled=@isLoading @bind-Value="newTaxRateData.Rate" min="0" max="1" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <input type="submit" class="col-sm-5 btn btn-primary" disabled=@isLoading value="Create">
+    </div>
+
+</EditForm>
+
+@if (isLoading)
+{
+    <div class="spinner"></div>
+}
+else if (showMessage)
+{
+    <h1>New Tax created successfully!</h1>
+}
+
+@code {
+    NewTaxRateData newTaxRateData = new NewTaxRateData { FromDate = DateTime.Today.Date};
+
+    bool isLoading;
+
+    bool showMessage;
+
+    private async void ValidFormSubmitted()
+    {
+        showMessage = false;
+        isLoading = true;
+        var request = new HttpRequestMessage(HttpMethod.Post,
+        $"https://localhost:5002/api/Tax");
+
+        var jsonData = JsonSerializer.Serialize(newTaxRateData);
+
+        request.Content = new StringContent(jsonData, Encoding.UTF8, "application/json"); ;
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            showMessage = true;
+        }
+        isLoading = false;
+        this.StateHasChanged();
+    }
+}

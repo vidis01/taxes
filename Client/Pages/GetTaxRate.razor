@@ -1,0 +1,71 @@
+﻿@page "/gettaxrate"
+
+@using TaxClient.Data
+@using System.Text.Json
+@inject IHttpClientFactory ClientFactory
+
+<EditForm Model="@requestData" OnValidSubmit=@ValidFormSubmitted>
+    <h1>Get municipality tax rate</h1>
+    <hr />
+    <div class="form-group row">
+        <label for="municipalityname" class="col-sm-2 col-form-label">Municipality name</label>
+        <div class="col-sm-3">
+            <InputText required id="municipalityname" class="form-control" disabled=@isLoading @bind-Value="requestData.Municipality" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="date" class="col-sm-2 col-form-label">Date</label>
+        <div class="col-sm-3">
+            <InputDate required id="date" class="form-control" disabled=@isLoading @bind-Value="requestData.Date" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <input type="submit" class="col-sm-5 btn btn-primary" disabled=@isLoading value="Get rate">
+    </div>
+
+</EditForm>
+
+@if(isLoading)
+{
+    <div class="spinner"></div>
+}
+else if (rate != "-1" && rate != "")
+{
+    <h1>Tax rate: @rate</h1>
+}
+else if (rate == "-1")
+{
+    <h1>Tax rate not found!</h1>    
+}
+
+@code {
+
+    RequestData requestData = new RequestData();
+
+    string rate = "";
+
+    bool isLoading;
+
+    private async void ValidFormSubmitted()
+    {
+        isLoading = true;
+        var request = new HttpRequestMessage(HttpMethod.Get,
+        $"https://localhost:5002/api/Tax/municipality={requestData.Municipality}&date={requestData.Date}");
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            rate = "" + await JsonSerializer.DeserializeAsync<double>(responseStream);
+        }
+        else
+        {
+            rate = "-1";
+        }
+        isLoading = false;
+        this.StateHasChanged();
+    }
+}
