@@ -37,9 +37,9 @@ namespace TaxAPI.Controllers
 
         // PUT api/<TaxController>
         [HttpPut]
-        public void Put([FromBody] UpdateTaxRateDto updateTaxRateDto)
+        public void Put([FromBody] TaxRateDto taxRateDto)
         {
-            TaxRepository.UpdateTaxRate(updateTaxRateDto);
+            TaxRepository.UpdateTaxRate(taxRateDto);
         }
 
         // DELETE api/<TaxController>/5

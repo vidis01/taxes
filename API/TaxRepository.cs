@@ -103,13 +103,13 @@ namespace TaxAPI
             Db.SaveChanges();
         }
 
-        public void UpdateTaxRate(UpdateTaxRateDto updateTaxRateDto)
+        public void UpdateTaxRate(TaxRateDto taxRateDto)
         {
-            var taxRate = Db.TaxRates.First(r => r.Id == updateTaxRateDto.Id);
-            taxRate.Period = updateTaxRateDto.Period;
-            taxRate.FromDate = updateTaxRateDto.FromDate;
-            taxRate.ToDate = updateTaxRateDto.ToDate;
-            taxRate.Rate = updateTaxRateDto.Rate;
+            var taxRate = Db.TaxRates.First(r => r.Id == taxRateDto.Id);
+            taxRate.Period = taxRateDto.Period;
+            taxRate.FromDate = taxRateDto.FromDate;
+            taxRate.ToDate = taxRateDto.ToDate;
+            taxRate.Rate = taxRateDto.Rate;
 
             Db.SaveChanges();
         }

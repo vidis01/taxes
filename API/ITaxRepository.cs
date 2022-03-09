@@ -9,7 +9,7 @@ namespace TaxAPI
         double GetTaxRate(string municipality, DateTime date);
         IEnumerable<TaxRateDto> GetAllTaxRates(string municipality);
         void CreateTaxRate(NewTaxRateDto newTaxRateDto);
-        void UpdateTaxRate(UpdateTaxRateDto updateTaxRateDto);
+        void UpdateTaxRate(TaxRateDto taxRateDto);
         void DeleteTaxRate(int id);
     }
 }
