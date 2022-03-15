@@ -75,11 +75,7 @@ else if (rates != null && rates.Any())
     }
     else if (deleteSelected)
     {
-        <h1>Do you really want to delete selected record?</h1>
-        <div class="row">
-            <input type="button" class="col-sm-3 btn btn-primary mr-3" disabled=@IsLoading @onclick="() => DeleteRecord(true)" value="Yes">
-            <input type="button" class="col-sm-3 btn btn-primary" disabled=@IsLoading @onclick="() => DeleteRecord(false)" value="No">
-        </div>
+        <DeleteTaxRate @bind-SelectedRow="SelectedRow" @bind-IsLoading="IsLoading"/>
     }
 }
 
@@ -135,32 +131,4 @@ else if (rates != null && rates.Any())
         this.StateHasChanged();
     }
 
-    private async void DeleteRecord(bool doDelete)
-    {
-        if (doDelete)
-        {
-            IsLoading = true;
-            var request = new HttpRequestMessage(HttpMethod.Delete,
-            $"https://localhost:5002/api/Tax/{SelectedRow.Id}");
-
-            var client = ClientFactory.CreateClient();
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-
-            }
-            IsLoading = false;
-            deleteSelected = false;
-            SelectedRow = null;
-            ValidFormSubmitted();
-        }
-        else
-        {
-            deleteSelected = false;
-            SelectedRow = null;
-            this.StateHasChanged();
-        }
-    }
 }
