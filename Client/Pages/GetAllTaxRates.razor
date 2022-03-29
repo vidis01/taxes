@@ -30,43 +30,7 @@ else if (showMessage)
 }
 else if (rates != null && rates.Any())
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Period (C)</th>
-                <th>From Date (F)</th>
-                <th>To Date</th>
-                <th>Rate</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var rate in rates)
-            {
-                <tr>
-                    <td>@rate.Id</td>
-                    <td>@rate.Period</td>
-                    <td>@rate.FromDate.ToShortDateString()</td>
-                    @if (rate.ToDate.HasValue)
-                    {
-                        <td>@rate.ToDate.Value.ToShortDateString()</td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                    <td>@rate.Rate</td>
-                    <td>
-                        <div class="row">
-                            <input type="button" class="col-sm-3 btn btn-primary mr-3" disabled=@IsLoading @onclick="() => ShowUpdateForm(rate)" value="Update">
-                            <input type="button" class="col-sm-3 btn btn-primary" disabled=@IsLoading @onclick="() => ShowDeleteApproval(rate)" value="Delete">
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <GetAllTaxRatesTable @bind-Rates="rates" @bind-SelectedRow="SelectedRow" @bind-IsLoading="IsLoading" @bind-UpdateSelected="updateSelected" @bind-DeleteSelected="deleteSelected"/>
 
     @if (updateSelected)
     {
@@ -93,18 +57,6 @@ else if (rates != null && rates.Any())
     bool deleteSelected;
 
     private TaxRateData SelectedRow { get; set; }
-
-    private void ShowUpdateForm(TaxRateData taxRateData)
-    {
-        SelectedRow = taxRateData;
-        updateSelected = true;
-    }
-
-    private void ShowDeleteApproval(TaxRateData taxRateData)
-    {
-        SelectedRow = taxRateData;
-        deleteSelected = true;
-    }
 
     private async void ValidFormSubmitted()
     {

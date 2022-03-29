@@ -1,0 +1,91 @@
+﻿@using TaxClient.Data
+@using System.Text.Json
+@using System.Text
+@inject IHttpClientFactory ClientFactory
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Period (C)</th>
+            <th>From Date (F)</th>
+            <th>To Date</th>
+            <th>Rate</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rate in Rates)
+        {
+            <tr>
+                <td>@rate.Id</td>
+                <td>@rate.Period</td>
+                <td>@rate.FromDate.ToShortDateString()</td>
+                @if (rate.ToDate.HasValue)
+                {
+                    <td>@rate.ToDate.Value.ToShortDateString()</td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@rate.Rate</td>
+                <td>
+                    <div class="row">
+                        <input type="button" class="col-sm-3 btn btn-primary mr-3" disabled=@IsLoading @onclick="() => ShowUpdateForm(rate)" value="Update">
+                        <input type="button" class="col-sm-3 btn btn-primary" disabled=@IsLoading @onclick="() => ShowDeleteApproval(rate)" value="Delete">
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public IEnumerable<TaxRateData> Rates { get; set; }
+
+    [Parameter]
+    public EventCallback<IEnumerable<TaxRateData>> RatesChanged { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsLoadingChanged { get; set; }
+
+    [Parameter]
+    public bool UpdateSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> UpdateSelectedChanged { get; set; }
+
+    [Parameter]
+    public bool DeleteSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> DeleteSelectedChanged { get; set; }
+
+    [Parameter]
+    public TaxRateData SelectedRow { get; set; }
+
+    [Parameter]
+    public EventCallback<TaxRateData> SelectedRowChanged { get; set; }
+
+    private void ShowUpdateForm(TaxRateData taxRateData)
+    {
+        SelectedRow = taxRateData;
+        UpdateSelected = true;
+        UpdateSelectedChanged.InvokeAsync(UpdateSelected);
+        SelectedRowChanged.InvokeAsync(SelectedRow);
+    }
+
+    private void ShowDeleteApproval(TaxRateData taxRateData)
+    {
+        SelectedRow = taxRateData;
+        DeleteSelected = true;
+        DeleteSelectedChanged.InvokeAsync(DeleteSelected);
+        SelectedRowChanged.InvokeAsync(SelectedRow);
+    }
+
+}

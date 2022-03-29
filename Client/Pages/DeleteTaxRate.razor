@@ -27,8 +27,10 @@
         if (doDelete)
         {
             IsLoading = true;
+            await IsLoadingChanged.InvokeAsync(IsLoading);
+
             var request = new HttpRequestMessage(HttpMethod.Delete,
-            $"https://localhost:5002/api/Tax/{SelectedRow.Id}");
+                $"https://localhost:5002/api/Tax/{SelectedRow.Id}");
 
             var client = ClientFactory.CreateClient();
 
@@ -39,11 +41,15 @@
 
             }
             IsLoading = false;
+            await IsLoadingChanged.InvokeAsync(IsLoading);
+
             SelectedRow = null;
+            await SelectedRowChanged.InvokeAsync(SelectedRow);
         }
         else
         {
             SelectedRow = null;
+            await SelectedRowChanged.InvokeAsync(SelectedRow);
             this.StateHasChanged();
         }
     }
