@@ -35,7 +35,7 @@ namespace TaxAPI
             });
 
             services.AddDbContext<TaxDBContext>(
-                options => options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=TaxDB;Trusted_Connection=True"));
+                options => options.UseSqlServer(Configuration.GetConnectionString("localdb")));
 
             services.AddScoped<ITaxRepository, TaxRepository>();
         }
